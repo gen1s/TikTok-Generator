@@ -7,7 +7,7 @@ from datetime import date
 
 
 #           Get reddit photos
-def get_photo(client_id,client_secret, user_agent, username,password,subreddit):
+def get_photo(client_id,client_secret, user_agent, username,password,subreddit, filename):
     folder = os.getcwd()
     reddit = praw.Reddit(client_id = client_id, client_secret = client_secret, user_agent = user_agent, username = username, password = password)
 
@@ -22,7 +22,7 @@ def get_photo(client_id,client_secret, user_agent, username,password,subreddit):
         format = i.url.split(".")
 
         if format[-1] == "jpg":
-            with open("bgImg.jpg", "wb") as file:
+            with open(filename, "wb") as file:
                 file.write(req.content)
                 file.close()
 
@@ -55,13 +55,13 @@ def split_quote(quote):
         tcharcount = tcharcount + len(i)
         if tcharcount < len(quote)/2:
             charcount = charcount + len(i)
-            if charcount > 27:
+            if charcount > 25:
                 i = i + "\n\n"
                 charcount = 0
             quote1 = quote1 + " " + i
         else:
             charcount2 = charcount2 + len(i)
-            if charcount2 > 27:
+            if charcount2 > 25:
                 i = i + "\n\n"
                 charcount2 = 0
             quote2 = quote2 + " " + i
@@ -76,7 +76,7 @@ def split_quote(quote):
 def get_music(music):
     print(len(music))
     n = random.randrange(0,len(music))
-    music_path = "music/" + music[n]
+    music_path = "music\\" + music[n]
     audio = AudioFileClip(music_path)
     if n == 0:
         audio = audio.subclip(8, 63)
@@ -137,7 +137,7 @@ def merge_video(fps, duration,image, quote1,quote2,audio):
     video_clip = concatenate_videoclips([subtitle_clip1,subtitle_clip2]).set_duration(duration)
     video_clip = video_clip.set_audio(audio).set_duration(duration)
 
-    video_clip.write_videofile("output.mp4", fps=fps)
+    video_clip.write_videofile("visual/output.mp4", fps=fps)
 
 if __name__ == "__main__":
     #           Pesonal Reddit Info
@@ -148,16 +148,18 @@ if __name__ == "__main__":
     password = ""
 
     music = ["metamorphosis(sped up).mp3", "Demons In My Soul.mp3", "Kosandra.mp3", "Mask Off.mp3", "experience _ ludovico einaudi.mp3", "Polozenie.mp3"]
+    photoname = "visual/bgImg.jpg"
+    quotespath = "quotes.txt"
 
-    duration = len(get_quote("quotes.txt").split(" "))/180 * 60
+    duration = len(get_quote(quotespath).split(" "))/180 * 60
     if duration < 10:
         duration = 10
     print(duration)
 
-    get_photo(client_id, client_secret, user_agent, username, password, "EarthPorn")
-    quote1, quote2 = split_quote(get_quote("quotes.txt"))
+    get_photo(client_id, client_secret, user_agent, username, password, "EarthPorn", photoname)
+    quote1, quote2 = split_quote(get_quote(quotespath))
     audio = get_music(music)
 
-    merge_video(10, duration, "bgImg.jpg", quote1, quote2, audio)
+    merge_video(60, duration, photoname, quote1, quote2, audio)
     
  
